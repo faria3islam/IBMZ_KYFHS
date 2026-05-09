@@ -85,8 +85,13 @@ export default function Login({ onNavigate }) {
             : 'Sign in with your registered email and password to continue.'}
         </p>
         <p className="text-xs text-slate-400">
-          Fields marked with <span className="text-rose-300">*</span> are required. Name is optional and will default to your email handle if left blank.
+          Fields marked with <span className="text-rose-300">*</span> are required.
         </p>
+        {isRegistering && (
+          <p className="text-xs text-slate-400">
+            Name is optional and will default to your email handle if left blank.
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

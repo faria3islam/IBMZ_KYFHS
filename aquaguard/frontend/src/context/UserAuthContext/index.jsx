@@ -15,9 +15,7 @@ function createDisplayName(email) {
 }
 
 function computeInitialPoints(email) {
-  const normalized = normalizeEmail(email);
-  const base = Math.min(1500, Math.max(650, normalized.length * 38 + normalized.charCodeAt(0)));
-  return base;
+  return 0;
 }
 
 export function UserAuthProvider({ children }) {
