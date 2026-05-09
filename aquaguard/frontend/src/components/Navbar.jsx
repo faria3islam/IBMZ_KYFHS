@@ -2,6 +2,7 @@ import React from 'react';
 
 const items = [
 	{ id: 'home', label: 'Home' },
+	{ id: 'overview', label: 'Overview' },
 	{ id: 'dashboard', label: 'Dashboard' },
 	{ id: 'report', label: 'Report' },
 	{ id: 'leaderboard', label: 'Leaderboard' }
