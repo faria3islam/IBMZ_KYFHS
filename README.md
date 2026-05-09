@@ -189,16 +189,26 @@ Edit `.env` and set:
 
 ```bash
 cd aquaguard/frontend
+cp .env.example .env
 npm run dev
 ```
 
 Open http://localhost:5173
+
+`VITE_API_BASE_URL` defaults to `http://localhost:4000`.
 
 ### Run backend (when available)
 
 ```bash
 cd aquaguard/backend
 npm start
+```
+
+### Smoke test backend
+
+```bash
+cd aquaguard/backend
+npm run smoke
 ```
 
 ---
@@ -239,6 +249,45 @@ Validation errors return HTTP 400 with this shape:
 curl -sG "http://localhost:4000/risk" --data-urlencode "location=Mumbai, MH"
 curl -sG "http://localhost:4000/summary" --data-urlencode "location=Mumbai, MH"
 curl -s -X POST "http://localhost:4000/report" -H "Content-Type: application/json" -d '{"location":"Mumbai, MH","issueType":"cloudy water","description":"Water appears cloudy this morning."}'
+```
+
+### Example Success Responses
+
+`GET /health`
+
+```json
+{
+	"status": "ok",
+	"service": "aquaguard-backend"
+}
+```
+
+`GET /risk?location=Mumbai,%20MH`
+
+```json
+{
+	"location": "Mumbai, MH",
+	"risk": "Safe",
+	"confidence": 71,
+	"riskScore": 30,
+	"factors": ["flood warning", "multiple community reports"],
+	"alerts": [],
+	"reports": [],
+	"generatedAt": "2026-05-09T23:40:00.000Z"
+}
+```
+
+`GET /summary?location=Mumbai,%20MH`
+
+```json
+{
+	"location": "Mumbai, MH",
+	"risk": "Safe",
+	"confidence": 71,
+	"summary": "AquaGuard marks Mumbai, MH as Safe...",
+	"factors": ["flood warning", "multiple community reports"],
+	"generatedAt": "2026-05-09T23:40:00.000Z"
+}
 ```
 
 ### Build
