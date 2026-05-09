@@ -9,39 +9,62 @@ const ALERT_WEIGHTS = {
 	sewage_overflow_risk: 15
 };
 
+// Known country aliases so users can search "canada", "UK", "usa" etc.
+const COUNTRY_ALIASES = {
+        canada: 'Canada',
+        ca: 'Canada',
+        'united states': 'United States',
+        usa: 'United States',
+        us: 'United States',
+        america: 'United States',
+        'united kingdom': 'United Kingdom',
+        uk: 'United Kingdom',
+        britain: 'United Kingdom',
+        england: 'United Kingdom',
+        australia: 'Australia',
+        au: 'Australia',
+        india: 'India',
+        bharat: 'India',
+        in: 'India'
+};
+
 function normalize(value) {
-	return String(value || '').trim().toLowerCase();
+        return String(value || '').trim().toLowerCase();
+}
+
+function resolveCountry(query) {
+        return COUNTRY_ALIASES[normalize(query)] || null;
 }
 
 function matchesLocation(candidateLocation, targetLocation, municipality) {
-	const candidate = normalize(candidateLocation);
-	const target = normalize(targetLocation);
+        const candidate = normalize(candidateLocation);
+        const target = normalize(targetLocation);
 
-	if (!candidate || !target) {
-		return false;
-	}
+        if (!candidate || !target) {
+                return false;
+        }
 
-	if (candidate === target) {
-		return true;
-	}
+        if (candidate === target) {
+                return true;
+        }
 
-	if (candidate.includes(target) || target.includes(candidate)) {
-		return true;
-	}
+        if (candidate.includes(target) || target.includes(candidate)) {
+                return true;
+        }
 
-	if (municipality) {
-		const municipalityName = normalize(municipality.name);
-		if (candidate === municipalityName || candidate.includes(municipalityName) || municipalityName.includes(candidate)) {
-			return true;
-		}
+        if (municipality) {
+                const municipalityName = normalize(municipality.name);
+                if (candidate === municipalityName || candidate.includes(municipalityName) || municipalityName.includes(candidate)) {
+                        return true;
+                }
 
-		return municipality.adjacentCommunities.some(function (adjacent) {
-			const adjacentName = normalize(adjacent);
-			return candidate === adjacentName || candidate.includes(adjacentName) || adjacentName.includes(candidate);
-		});
-	}
+                return municipality.adjacentCommunities.some(function (adjacent) {
+                        const adjacentName = normalize(adjacent);
+                        return candidate === adjacentName || candidate.includes(adjacentName) || adjacentName.includes(candidate);
+                });
+        }
 
-	return false;
+        return false;
 }
 
 function clamp(value, min, max) {
@@ -171,3 +194,62 @@ export function calculateWaterRisk(location) {
 }
 
 export default calculateWaterRisk;
+
+// ─── Country-level aggregation ───────────────────────────────────────────────
+
+export function isCountryQuery(query) {
+        return resolveCountry(query) !== null;
+}
+
+/**
+ * Returns an array of per-city risk results for every municipality in a country,
+ * plus a summary object with aggregate stats.
+ */
+export function calculateCountryRisk(query) {
+        const country = resolveCountry(query);
+        if (!country) return null;
+
+        const cityMunicipalities = municipalities.filter(function (m) {
+                return m.country === country;
+        });
+
+        const cityResults = cityMunicipalities.map(function (m) {
+                return calculateWaterRisk(m.name);
+        });
+
+        // Aggregate counts
+        const counts = { Safe: 0, Caution: 0, Unsafe: 0 };
+        let totalAlerts = 0;
+        let totalReports = 0;
+        let worstScore = 0;
+        let worstCity = null;
+
+        cityResults.forEach(function (r) {
+                counts[r.riskLevel] = (counts[r.riskLevel] || 0) + 1;
+                totalAlerts += r.activeAlerts.length;
+                totalReports += r.matchingReports.length;
+                if (r.riskScore > worstScore) {
+                        worstScore = r.riskScore;
+                        worstCity = r;
+                }
+        });
+
+        // Country-level risk level is driven by worst city
+        const overallLevel = getRiskLevel(worstScore);
+        const avgConfidence = cityResults.length
+                ? Math.round(cityResults.reduce(function (sum, r) { return sum + r.confidence; }, 0) / cityResults.length)
+                : 45;
+
+        return {
+                isCountry: true,
+                country,
+                overallLevel,
+                overallScore: worstScore,
+                confidence: avgConfidence,
+                counts,
+                totalAlerts,
+                totalReports,
+                worstCity,
+                cityResults
+        };
+}
