@@ -12,6 +12,14 @@ const CATEGORIES: EmissionCategory[] = [
   'waste',
 ];
 
+const CATEGORY_LABELS: Record<EmissionCategory, string> = {
+  transportation: 'Official Alerts',
+  energy: 'Weather and Flood Warnings',
+  food: 'Local News Evidence',
+  shopping: 'Community Reports',
+  waste: 'Infrastructure Overlap',
+};
+
 interface EmissionLoggerProps {
   onAdd: (entry: Omit<EmissionEntry, 'id'>) => void;
 }
@@ -40,12 +48,12 @@ export default function EmissionLogger({ onAdd }: EmissionLoggerProps) {
   }
 
   return (
-    <section id="log" className={styles.section}>
-      <h2 className={styles.heading}>Log an Emission</h2>
+    <section id="community" className={styles.section}>
+      <h2 className={styles.heading}>Community Signal Intake</h2>
       <Card>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label htmlFor="category" className={styles.label}>Category</label>
+            <label htmlFor="category" className={styles.label}>Evidence Source</label>
             <select
               id="category"
               className={styles.select}
@@ -53,18 +61,18 @@ export default function EmissionLogger({ onAdd }: EmissionLoggerProps) {
               onChange={(e) => setCategory(e.target.value as EmissionCategory)}
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                <option key={cat} value={cat}>{CATEGORY_LABELS[cat]}</option>
               ))}
             </select>
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="description" className={styles.label}>Description</label>
+            <label htmlFor="description" className={styles.label}>Location or Observation</label>
             <input
               id="description"
               type="text"
               className={styles.input}
-              placeholder="e.g. Drive to work (15 km)"
+              placeholder="e.g. Brown water near Riverside Park intake"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
@@ -72,12 +80,12 @@ export default function EmissionLogger({ onAdd }: EmissionLoggerProps) {
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="amount" className={styles.label}>CO₂e Amount (kg)</label>
+            <label htmlFor="amount" className={styles.label}>Signal Weight (points)</label>
             <input
               id="amount"
               type="number"
               className={styles.input}
-              placeholder="e.g. 3.2"
+              placeholder="e.g. 12"
               min="0"
               step="0.01"
               value={amount}
@@ -87,9 +95,9 @@ export default function EmissionLogger({ onAdd }: EmissionLoggerProps) {
           </div>
 
           <div className={styles.actions}>
-            <Button type="submit">Add Entry</Button>
+            <Button type="submit">Submit Signal</Button>
             {submitted && (
-              <span className={styles.success}>✓ Entry logged successfully!</span>
+              <span className={styles.success}>✓ Signal added to local evidence queue</span>
             )}
           </div>
         </form>

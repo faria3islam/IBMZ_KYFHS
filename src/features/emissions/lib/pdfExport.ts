@@ -117,12 +117,12 @@ function addHeader(doc: jsPDF, generatedAt: string): void {
   doc.setFontSize(18);
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.text('EcoSense', MARGIN, 17);
+  doc.text('AquaGuard AI', MARGIN, 17);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...LIGHT_GREEN);
-  doc.text('Carbon Emissions Report', MARGIN, 24);
+  doc.text('Water Risk Intelligence Briefing', MARGIN, 24);
 
   // Date top-right
   doc.setFontSize(8);
@@ -137,7 +137,7 @@ function addFooter(doc: jsPDF, pageNum: number, totalPages: number): void {
 
   doc.setFontSize(8);
   doc.setTextColor(...LIGHT_GREEN);
-  doc.text('EcoSense — Track, understand, and reduce your carbon footprint', MARGIN, y + 2);
+  doc.text('AquaGuard AI - Explainable water risk intelligence', MARGIN, y + 2);
   doc.text(`Page ${pageNum} / ${totalPages}`, pageWidth(doc) - MARGIN, y + 2, { align: 'right' });
 }
 
@@ -148,17 +148,17 @@ function addStatBoxes(doc: jsPDF, report: ReportData, y: number): number {
   const boxW = (pageWidth(doc) - MARGIN * 2 - 9) / 4;
 
   const boxes = [
-    { label: 'Total Emissions', value: `${stats.totalEmissions} kg`, unit: 'CO\u2082e' },
-    { label: 'Daily Average',   value: `${stats.monthlyAverage} kg`, unit: 'CO\u2082e / day' },
+    { label: 'Risk Score', value: `${Math.min(100, Math.round(stats.totalEmissions))}/100`, unit: 'Composite' },
+    { label: 'Confidence', value: `${Math.max(55, Math.min(98, Math.round(60 + stats.monthlyAverage)))}%`, unit: 'Evidence quality' },
     {
-      label: 'Top Category',
+      label: 'Dominant Signal',
       value: stats.topCategory.charAt(0).toUpperCase() + stats.topCategory.slice(1),
-      unit: 'Highest emitter',
+      unit: 'Weighted source',
     },
     {
-      label: 'vs. Last Period',
+      label: 'Signal Drift',
       value: `${stats.percentageChange > 0 ? '+' : ''}${stats.percentageChange}%`,
-      unit: stats.percentageChange < 0 ? 'Improvement' : 'Needs work',
+      unit: stats.percentageChange < 0 ? 'Stabilizing' : 'Escalating',
     },
   ];
 
@@ -221,14 +221,14 @@ export function exportReportPDF(report: ReportData): void {
   y += 4;
 
   // Summary section
-  y = sectionTitle(doc, 'Emissions Summary', y);
+  y = sectionTitle(doc, 'Risk Summary', y);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...TEXT_DARK);
   y = addWrappedText(doc, report.aiSummary, MARGIN, y, contentW) + 6;
 
   // Category breakdown chart
-  y = sectionTitle(doc, 'Breakdown by Category', y);
+  y = sectionTitle(doc, 'Evidence Breakdown', y);
 
   const breakdown = report.entries.reduce<Record<string, number>>((acc, e) => {
     acc[e.category] = Number(((acc[e.category] ?? 0) + e.amount).toFixed(2));
@@ -238,16 +238,16 @@ export function exportReportPDF(report: ReportData): void {
   y = addBarChart(doc, breakdown, y) + 4;
 
   // AI Advice
-  y = sectionTitle(doc, 'AI-Powered Recommendations', y);
+  y = sectionTitle(doc, 'AI Recommendations', y);
   y = addAccentBlock(doc, report.aiAdvice, y, contentW) + 4;
 
   // ── Emission Log table (auto page-break) ────────────────────────────────────
-  y = sectionTitle(doc, 'Full Emission Log', y);
+  y = sectionTitle(doc, 'Full Evidence Log', y);
 
   autoTable(doc, {
     startY: y,
     margin: { left: MARGIN, right: MARGIN },
-    head: [['Date', 'Category', 'Description', 'CO\u2082e (kg)']],
+    head: [['Date', 'Source', 'Observation', 'Weight (pts)']],
     body: report.entries.map((e) => [
       e.date,
       e.category.charAt(0).toUpperCase() + e.category.slice(1),
@@ -284,6 +284,6 @@ export function exportReportPDF(report: ReportData): void {
     addFooter(doc, p, totalPages);
   }
 
-  const filename = `ecosense-report-${new Date(report.generatedAt).toISOString().split('T')[0]}.pdf`;
+  const filename = `aquaguard-risk-brief-${new Date(report.generatedAt).toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
 }

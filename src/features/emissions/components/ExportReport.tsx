@@ -16,23 +16,23 @@ export default function ExportReport({ stats, entries }: ExportReportProps) {
 
   return (
     <section id="export" className={styles.section}>
-      <h2 className={styles.heading}>📄 Export Report</h2>
+      <h2 className={styles.heading}>Export Risk Briefing</h2>
       <p className={styles.subheading}>
-        Generate a PDF report with your emissions summary and AI-powered advice.
+        Generate a PDF briefing with risk classification, confidence details, and explainable AI narrative.
       </p>
 
       <Card className={styles.card}>
         <div className={styles.info}>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Entries included</span>
+            <span className={styles.infoLabel}>Evidence points</span>
             <span className={styles.infoValue}>{entries.length}</span>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Total emissions</span>
-            <span className={styles.infoValue}>{stats.totalEmissions} kg CO₂e</span>
+            <span className={styles.infoLabel}>Composite score</span>
+            <span className={styles.infoValue}>{Math.min(100, Math.round(stats.totalEmissions))} / 100</span>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>AI advice</span>
+            <span className={styles.infoLabel}>AI explanation</span>
             <span className={styles.infoValue}>Included ✓</span>
           </div>
           <div className={styles.infoItem}>
@@ -45,7 +45,7 @@ export default function ExportReport({ stats, entries }: ExportReportProps) {
           <div className={styles.progress}>
             <div className={styles.progressBar} />
             <p className={styles.progressText}>
-              Generating AI summary and building your PDF…
+              Generating explainable reasoning and building your PDF...
             </p>
           </div>
         )}
@@ -56,7 +56,7 @@ export default function ExportReport({ stats, entries }: ExportReportProps) {
           <p className={styles.success}>
             ✓ Report downloaded —{' '}
             <span className={styles.filename}>
-              ecosense-report-{lastReport.generatedAt.split('T')[0]}.pdf
+              aquaguard-risk-brief-{lastReport.generatedAt.split('T')[0]}.pdf
             </span>
           </p>
         )}
@@ -67,11 +67,11 @@ export default function ExportReport({ stats, entries }: ExportReportProps) {
             isLoading={isGenerating}
             size="lg"
           >
-            {isGenerating ? 'Generating…' : '⬇ Download PDF Report'}
+            {isGenerating ? 'Generating...' : 'Download Risk PDF'}
           </Button>
           <p className={styles.hint}>
-            The report includes an emissions breakdown, AI-generated narrative summary,
-            and personalised recommendations.
+            The briefing includes risk scoring signals, AI-generated narrative explanation,
+            and recommended response actions.
           </p>
         </div>
       </Card>

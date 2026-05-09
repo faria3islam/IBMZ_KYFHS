@@ -10,7 +10,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className={styles.footer}>
-        <p>© 2026 EcoSense — Track, understand, and reduce your carbon footprint</p>
+        <p>© 2026 AquaGuard AI - Explainable water risk intelligence for communities and response teams</p>
       </footer>
     </div>
   );

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 /**
- * Variables declared here must be listed in `.env` / `.env.local` at the EcoSense
+ * Variables declared here must be listed in `.env` / `.env.local` at the AquaGuard AI
  * project root with the `VITE_` prefix. Only those keys are exposed to client code.
  */
 interface ImportMetaEnv {

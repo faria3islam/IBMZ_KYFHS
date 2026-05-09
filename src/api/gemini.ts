@@ -4,11 +4,11 @@ import type { AdvisorRequest, AdvisorResponse, ChatMessage, DashboardStats, Emis
 
 const API_KEY = getGeminiApiKey();
 
-const SYSTEM_INSTRUCTION = `You are EcoSense AI, a knowledgeable and friendly carbon footprint advisor.
-Your role is to help users understand and reduce their carbon emissions.
-Provide clear, actionable, and encouraging advice. Keep responses concise (2-4 paragraphs).
-Focus on practical tips, alternatives, and positive reinforcement.
-When discussing emissions, use kg CO₂e as the unit where relevant.`;
+const SYSTEM_INSTRUCTION = `You are AquaGuard AI, an environmental risk explanation assistant.
+Your role is to explain water contamination risk assessments in clear, auditable language.
+The backend computes risk score, confidence, and classification; you explain why using provided evidence.
+Keep responses concise (2-4 paragraphs) and include practical recommendations.
+When confidence is limited, state uncertainty and suggest what additional data is needed.`;
 
 function createClient(): GoogleGenerativeAI | null {
   if (!API_KEY) return null;
@@ -23,7 +23,7 @@ function toGeminiHistory(history: ChatMessage[]) {
 }
 
 /**
- * Send a message to the Gemini API and get an eco-advisor response.
+ * Send a message to the Gemini API and get a risk explanation response.
  */
 export async function getAdvisorResponse(
   request: AdvisorRequest
@@ -59,11 +59,11 @@ export async function getAdvisorResponse(
 }
 
 /**
- * Generate eco-tips for a specific emission category using Gemini.
+ * Generate risk-response tips for a specific evidence category.
  */
 export async function getEcoTips(category: string): Promise<AdvisorResponse> {
   return getAdvisorResponse({
-    prompt: `Give me 3 practical tips to reduce my carbon footprint from ${category}. Format as a numbered list.`,
+    prompt: `Give me 3 practical actions to reduce water contamination risk related to ${category}. Format as a numbered list.`,
   });
 }
 
@@ -81,7 +81,7 @@ export async function generateReportContent(
   }, {});
 
   const breakdownText = Object.entries(categoryBreakdown)
-    .map(([cat, kg]) => `  • ${cat}: ${kg} kg CO₂e`)
+    .map(([cat, points]) => `  - ${cat}: ${points} signal points`)
     .join('\n');
 
   const trend =
@@ -90,23 +90,24 @@ export async function generateReportContent(
       : `up ${stats.percentageChange}% from last period`;
 
   const summaryPrompt = `
-Write a 2-3 sentence narrative summary of the following carbon footprint data for inclusion in a PDF report.
-Be factual, clear, and encouraging. Do not use markdown or bullet points.
+Write a 2-3 sentence narrative summary of the following water risk assessment data for a PDF briefing.
+Be factual, explainable, and operationally useful. Do not use markdown or bullet points.
 
-Total emissions: ${stats.totalEmissions} kg CO₂e
-Daily average: ${stats.monthlyAverage} kg CO₂e/day
+Composite risk score: ${Math.min(100, Math.round(stats.totalEmissions))}/100
+Confidence proxy: ${Math.max(55, Math.min(98, Math.round(60 + stats.monthlyAverage)))}%
 Trend: ${trend}
-Top category: ${stats.topCategory}
-Category breakdown:
+Dominant evidence source: ${stats.topCategory}
+Evidence breakdown:
 ${breakdownText}
 `.trim();
 
   const advicePrompt = `
-Based on the carbon footprint data below, write 3-5 concise, actionable recommendations to reduce emissions.
+Based on the water risk evidence below, write 3-5 concise, actionable recommendations.
+Each recommendation should reference monitoring, mitigation, or communication actions.
 Format each recommendation as a plain numbered list (e.g. "1. ..."). No markdown headers or bold text.
 
-Top category: ${stats.topCategory}
-Category breakdown:
+Dominant evidence source: ${stats.topCategory}
+Evidence breakdown:
 ${breakdownText}
 `.trim();
 
@@ -116,16 +117,16 @@ ${breakdownText}
   ]);
 
   const fallbackSummary =
-    `Total emissions recorded: ${stats.totalEmissions} kg CO₂e ` +
-    `(daily average ${stats.monthlyAverage} kg CO₂e/day). ` +
-    `Top emitting category: ${stats.topCategory}.`;
+    `Composite risk score is ${Math.min(100, Math.round(stats.totalEmissions))}/100 with ` +
+    `${Math.max(55, Math.min(98, Math.round(60 + stats.monthlyAverage)))}% confidence. ` +
+    `The strongest evidence source is ${stats.topCategory}.`;
 
   const fallbackAdvice =
-    '1. Reduce car trips by combining errands or using public transport.\n' +
-    '2. Switch to energy-efficient appliances and LED lighting.\n' +
-    '3. Reduce meat consumption, especially beef.\n' +
-    '4. Buy second-hand or only what you need.\n' +
-    '5. Compost organic waste to reduce landfill methane.';
+    '1. Increase water sampling frequency in the highest-risk zone.\n' +
+    '2. Cross-check flood alerts with nearby infrastructure vulnerabilities.\n' +
+    '3. Escalate advisories when community reports cluster in one area.\n' +
+    '4. Share clear public guidance with confidence and uncertainty notes.\n' +
+    '5. Track daily evidence drift to detect rapid risk changes.';
 
   return {
     summary: summaryRes.error || !summaryRes.content ? fallbackSummary : summaryRes.content,

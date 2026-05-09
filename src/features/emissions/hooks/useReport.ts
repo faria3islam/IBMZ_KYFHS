@@ -22,7 +22,7 @@ export function useReport(
 
   const generateAndExport = useCallback(async () => {
     if (entries.length === 0) {
-      setError('No emission entries to report. Log some data first.');
+      setError('No evidence signals to report. Add community or alert data first.');
       setStatus('error');
       return;
     }

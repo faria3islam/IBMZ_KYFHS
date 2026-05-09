@@ -48,7 +48,7 @@ export default function RegisterPage() {
   return (
     <div className={styles.wrap}>
       <h1 className={styles.title}>Create account</h1>
-      <p className={styles.subtitle}>Join EcoSense to track your footprint.</p>
+      <p className={styles.subtitle}>Join AquaGuard AI to monitor water risk signals.</p>
 
       <Card>
         <form className={styles.form} onSubmit={handleSubmit}>

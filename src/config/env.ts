@@ -1,5 +1,5 @@
 /**
- * Application environment from `.env` in the EcoSense project root.
+ * Application environment from `.env` in the AquaGuard AI project root.
  *
  * Vite loads these files (in order, later overrides earlier): `.env`, `.env.local`,
  * `.env.[mode]`, `.env.[mode].local` — see https://vite.dev/guide/env-and-mode.html

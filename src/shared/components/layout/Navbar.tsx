@@ -5,10 +5,11 @@ import { AppRoutes } from '@/routes/appRoutes';
 import styles from './Navbar.module.css';
 
 const SECTION_LINKS = [
-  { label: 'Dashboard', href: '#dashboard' },
-  { label: 'Log Emissions', href: '#log' },
-  { label: 'AI Advisor', href: '#advisor' },
-  { label: 'Export PDF', href: '#export' },
+  { label: 'Risk Dashboard', href: '#dashboard' },
+  { label: 'Risk Map', href: '#risk-map' },
+  { label: 'Community Signals', href: '#community' },
+  { label: 'AI Explanations', href: '#advisor' },
+  { label: 'Briefing PDF', href: '#export' },
 ];
 
 export default function Navbar() {
@@ -21,8 +22,8 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <Link className={styles.brand} to={AppRoutes.home} onClick={() => setMenuOpen(false)}>
-        <span className={styles.logo}>🌿</span>
-        <span className={styles.brandName}>EcoSense</span>
+        <span className={styles.logo}>🌊</span>
+        <span className={styles.brandName}>AquaGuard AI</span>
       </Link>
 
       <button

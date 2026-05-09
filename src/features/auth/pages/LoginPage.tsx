@@ -36,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className={styles.wrap}>
       <h1 className={styles.title}>Sign in</h1>
-      <p className={styles.subtitle}>Welcome back to EcoSense.</p>
+      <p className={styles.subtitle}>Welcome back to AquaGuard AI.</p>
 
       <Card>
         <form className={styles.form} onSubmit={handleSubmit}>

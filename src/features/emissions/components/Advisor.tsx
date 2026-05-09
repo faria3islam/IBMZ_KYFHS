@@ -5,10 +5,10 @@ import { useAdvisor } from '@/features/emissions/hooks/useAdvisor';
 import styles from './Advisor.module.css';
 
 const SUGGESTED_PROMPTS = [
-  'How can I reduce my transportation emissions?',
-  'What are easy ways to save energy at home?',
-  'Give me sustainable food swaps to lower my carbon footprint.',
-  'How does my footprint compare to the global average?',
+  'Explain why this location is classified as Caution and what evidence matters most.',
+  'What additional data would raise confidence in a Safe classification?',
+  'Summarize how flood warnings and advisories influence the final score.',
+  'Give incident response recommendations for a high-risk zone.',
 ];
 
 export default function Advisor() {
@@ -35,16 +35,16 @@ export default function Advisor() {
 
   return (
     <section id="advisor" className={styles.section}>
-      <h2 className={styles.heading}>🌿 AI Eco Advisor</h2>
+      <h2 className={styles.heading}>AI Explanation Panel</h2>
       <p className={styles.subheading}>
-        Powered by Gemini — ask anything about reducing your carbon footprint.
+        Powered by IBM watsonx.ai style reasoning: evidence-informed explanations, recommendations, and confidence rationale.
       </p>
 
       <Card className={styles.chatCard}>
         {messages.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyIcon}>🤖</p>
-            <p>Ask the EcoSense AI advisor a question to get started!</p>
+            <p>Ask AquaGuard AI to explain a classification or outline risk response actions.</p>
             <div className={styles.suggestions}>
               {SUGGESTED_PROMPTS.map((p) => (
                 <button
@@ -66,7 +66,7 @@ export default function Advisor() {
                 className={`${styles.message} ${msg.role === 'user' ? styles.userMsg : styles.modelMsg}`}
               >
                 <div className={styles.msgBubble}>
-                  {msg.role === 'model' && <span className={styles.msgIcon}>🌿</span>}
+                  {msg.role === 'model' && <span className={styles.msgIcon}>🌊</span>}
                   <div className={styles.msgContent}>{msg.content}</div>
                 </div>
                 <div className={styles.msgTime}>
@@ -77,7 +77,7 @@ export default function Advisor() {
             {isLoading && (
               <div className={`${styles.message} ${styles.modelMsg}`}>
                 <div className={styles.msgBubble}>
-                  <span className={styles.msgIcon}>🌿</span>
+                  <span className={styles.msgIcon}>🌊</span>
                   <div className={styles.typing}>
                     <span /><span /><span />
                   </div>
@@ -94,7 +94,7 @@ export default function Advisor() {
           <input
             className={styles.chatInput}
             type="text"
-            placeholder="Ask about your carbon footprint…"
+            placeholder="Ask for explainable risk reasoning..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}

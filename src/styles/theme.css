@@ -1,34 +1,34 @@
-/* EcoSense Forest Green Theme */
+/* AquaGuard Ocean Theme */
 :root {
   /* Primary Palette */
-  --color-primary:         #2d6a4f;
-  --color-primary-light:   #40916c;
-  --color-primary-lighter: #52b788;
-  --color-primary-dark:    #1b4332;
-  --color-primary-darker:  #081c15;
+  --color-primary:         #0d5f77;
+  --color-primary-light:   #1e7f9c;
+  --color-primary-lighter: #34a3c4;
+  --color-primary-dark:    #083f52;
+  --color-primary-darker:  #052632;
 
   /* Accent */
-  --color-accent:          #74c69d;
-  --color-accent-light:    #b7e4c7;
-  --color-accent-lighter:  #d8f3dc;
+  --color-accent:          #5fd6be;
+  --color-accent-light:    #b5f0e4;
+  --color-accent-lighter:  #defbf4;
 
   /* Neutrals */
-  --color-bg:              #f8fdf9;
+  --color-bg:              #f3fbff;
   --color-surface:         #ffffff;
-  --color-surface-alt:     #f0faf3;
-  --color-border:          #d0e8d8;
+  --color-surface-alt:     #edf8fc;
+  --color-border:          #cfe6f0;
 
   /* Text */
-  --color-text-primary:    #1b4332;
-  --color-text-secondary:  #40916c;
-  --color-text-muted:      #6c9e84;
+  --color-text-primary:    #0a3444;
+  --color-text-secondary:  #1b627b;
+  --color-text-muted:      #5f8ea0;
   --color-text-on-primary: #ffffff;
 
   /* Semantic */
-  --color-success:         #52b788;
-  --color-warning:         #f4a261;
-  --color-error:           #e63946;
-  --color-info:            #4361ee;
+  --color-success:         #1aa572;
+  --color-warning:         #de8b24;
+  --color-error:           #d64545;
+  --color-info:            #227fd6;
 
   /* Spacing */
   --space-xs:  0.25rem;
@@ -55,7 +55,8 @@
   --transition-base: 250ms ease;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'IBM Plex Sans', sans-serif;
   --font-size-xs:   0.75rem;
   --font-size-sm:   0.875rem;
   --font-size-base: 1rem;

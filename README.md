@@ -1,6 +1,23 @@
-**Carbon emissions tracker and AI-powered eco advisor**
+## AquaGuard AI
 
-EcoSense helps you track your carbon footprint across transportation, energy, food, shopping, and waste — and uses Google Gemini AI to give you personalised, actionable advice on reducing your environmental impact.
+AI-Powered Water Risk Intelligence Platform.
+
+AquaGuard AI is a React + TypeScript web application for explainable water contamination risk monitoring. The current implementation presents a risk dashboard experience with evidence intake, AI explanation support, and PDF risk brief exports.
+
+### Product Direction
+
+- Combines official alerts, weather signals, local context, and community reports.
+- Uses backend scoring logic to compute risk and confidence.
+- Uses AI to explain the result, not to make the decision.
+- Surfaces risk as Safe / Caution / Unsafe with confidence framing.
+
+### Explainable Pipeline
+
+1. User enters a location.
+2. Backend gathers alerts and environmental evidence.
+3. Retrieval step provides grounded context.
+4. Risk engine computes score and classification.
+5. AI generates human-readable rationale and recommendations.
 
 ### Prerequisites
 
@@ -11,7 +28,7 @@ EcoSense helps you track your carbon footprint across transportation, energy, fo
 
 ```bash
 git clone <repo-url>
-cd EcoSense
+cd IBMZ_KYFHS
 npm install
 ```
 
@@ -43,4 +60,11 @@ npm run build
 - **React 19** + **TypeScript**
 - **Vite** — fast dev/build tooling
 - **CSS Modules** — scoped component styles
-- **Google Gemini API**
+- **Google Gemini API** (placeholder path for AI explanation integration)
+- **jsPDF + jspdf-autotable** for risk briefing export
+
+### Current Scope Notes
+
+- The codebase is currently frontend-centric with mock/demo-style data flow in parts of the risk pipeline.
+- The UI language has been refocused to AquaGuard AI and explainable risk framing.
+- A backend service for production-grade scoring, retrieval, and audit logs can be layered in without changing core React structure.
