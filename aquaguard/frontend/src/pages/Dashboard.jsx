@@ -97,7 +97,7 @@ function CountryDashboard({ result }) {
 }
 
 export default function Dashboard() {
-        const [inputValue, setInputValue] = useState('Windsor, ON');
+        const [inputValue, setInputValue] = useState('');
         const [searchedLocation, setSearchedLocation] = useState('Windsor, ON');
 
         function handleSearch(e) {
