@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AlertFeed from '../components/AlertFeed';
 import AISummary from '../components/AISummary';
 import RiskCard from '../components/RiskCard';
@@ -98,7 +98,10 @@ function CountryDashboard({ result }) {
 
 export default function Dashboard() {
         const [inputValue, setInputValue] = useState('');
-        const [searchedLocation, setSearchedLocation] = useState('Windsor, ON');
+        const [searchedLocation, setSearchedLocation] = useState('');
+        const [cityRisk, setCityRisk] = useState(null);
+        const [cityLoading, setCityLoading] = useState(false);
+        const [cityError, setCityError] = useState('');
 
         function handleSearch(e) {
                 e.preventDefault();
@@ -108,9 +111,76 @@ export default function Dashboard() {
                 }
         }
 
-        const isCountry = isCountryQuery(searchedLocation);
+        const hasSearch = searchedLocation.trim().length > 0;
+        const isCountry = hasSearch ? isCountryQuery(searchedLocation) : false;
         const countryResult = isCountry ? calculateCountryRisk(searchedLocation) : null;
-        const cityRisk = !isCountry ? calculateWaterRisk(searchedLocation) : null;
+
+        useEffect(function () {
+                if (!hasSearch || isCountry) {
+                        setCityRisk(null);
+                        setCityError('');
+                        setCityLoading(false);
+                        return;
+                }
+
+                const controller = new AbortController();
+                const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+
+                async function loadCityRisk() {
+                        setCityLoading(true);
+                        setCityError('');
+
+                        try {
+                                const query = encodeURIComponent(searchedLocation);
+                                const [riskResponse, summaryResponse] = await Promise.all([
+                                        fetch(apiBase + '/risk?location=' + query, { signal: controller.signal }),
+                                        fetch(apiBase + '/summary?location=' + query, { signal: controller.signal })
+                                ]);
+
+                                if (!riskResponse.ok) {
+                                        throw new Error('Risk endpoint failed with status ' + riskResponse.status);
+                                }
+
+                                const riskPayload = await riskResponse.json();
+                                const summaryPayload = summaryResponse.ok ? await summaryResponse.json() : null;
+
+                                const factors = Array.isArray(riskPayload.factors) ? riskPayload.factors : [];
+
+                                setCityRisk({
+                                        location: riskPayload.location || searchedLocation,
+                                        riskScore: Number(riskPayload.riskScore || 0),
+                                        riskLevel: riskPayload.risk || riskPayload.riskLevel || 'Safe',
+                                        confidence: Number(riskPayload.confidence || 40),
+                                        contributingFactors: factors.map(function (factor) {
+                                                return {
+                                                        label: String(factor),
+                                                        score: 0,
+                                                        detail: 'Signal identified by backend evidence retrieval.'
+                                                };
+                                        }),
+                                        activeAlerts: Array.isArray(riskPayload.alerts) ? riskPayload.alerts : [],
+                                        matchingReports: Array.isArray(riskPayload.reports) ? riskPayload.reports : [],
+                                        explanation: summaryPayload?.summary || 'AI summary unavailable. Showing backend risk result.',
+                                });
+                        } catch (error) {
+                                if (error?.name === 'AbortError') {
+                                        return;
+                                }
+
+                                // Fallback keeps the demo usable when backend is unavailable.
+                                setCityRisk(calculateWaterRisk(searchedLocation));
+                                setCityError('Live API unavailable. Showing local fallback data.');
+                        } finally {
+                                setCityLoading(false);
+                        }
+                }
+
+                loadCityRisk();
+
+                return function () {
+                        controller.abort();
+                };
+        }, [hasSearch, isCountry, searchedLocation]);
 
         return (
                 <div className="space-y-6">
@@ -124,7 +194,7 @@ export default function Dashboard() {
                                                 list="known-locations"
                                                 value={inputValue}
                                                 onChange={function (e) { setInputValue(e.target.value); }}
-                                                placeholder="Search a city or country (e.g. Windsor, ON or Canada)"
+                                                placeholder="Search a city or country"
                                                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-white placeholder-slate-500 backdrop-blur focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
                                         />
                                         <datalist id="known-locations">
@@ -142,10 +212,26 @@ export default function Dashboard() {
                         </form>
 
                         {/* Results */}
-                        {isCountry && countryResult ? (
+                        {!hasSearch ? (
+                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-slate-300">
+                                        <div className="text-lg font-semibold text-white">Start with a location search</div>
+                                        <p className="mt-2 text-sm text-slate-400">
+                                                Search any city or country to generate a risk overview.
+                                        </p>
+                                </div>
+                        ) : isCountry && countryResult ? (
                                 <CountryDashboard result={countryResult} />
+                        ) : cityLoading ? (
+                                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center text-slate-300">
+                                        Loading live risk data for <span className="text-white">{searchedLocation}</span>...
+                                </div>
                         ) : cityRisk ? (
                                 <>
+                                        {cityError ? (
+                                                <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                                                        {cityError}
+                                                </div>
+                                        ) : null}
                                         <RiskCard risk={cityRisk} />
                                         <div className="grid gap-6 lg:grid-cols-2">
                                                 <AlertFeed alerts={cityRisk.activeAlerts} />

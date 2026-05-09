@@ -152,33 +152,58 @@ This logic lives inside the risk engine.
 ### Prerequisites
 
 - Node.js 18+
-- API key for AI provider used in current implementation
+- IBM watsonx.ai credentials (for live summary generation)
 
 ### Installation
 
 ```bash
 git clone <repo-url>
 cd IBMZ_KYFHS
+```
+
+### Install dependencies
+
+```bash
+cd aquaguard/frontend
+npm install
+
+cd ../backend
 npm install
 ```
 
-### Configuration
+### Configure backend environment
 
 ```bash
+cd aquaguard/backend
 cp .env.example .env
-# Add VITE_GEMINI_API_KEY and API endpoint settings as needed
 ```
 
-### Run
+Edit `.env` and set:
+
+- `WATSONX_API_KEY`
+- `WATSONX_PROJECT_ID`
+- `WATSONX_BASE_URL` (for example `https://us-south.ml.cloud.ibm.com`)
+- `WATSONX_MODEL_ID` (optional)
+
+### Run frontend
 
 ```bash
+cd aquaguard/frontend
 npm run dev
 ```
 
 Open http://localhost:5173
 
+### Run backend (when available)
+
+```bash
+cd aquaguard/backend
+npm start
+```
+
 ### Build
 
 ```bash
+cd aquaguard/frontend
 npm run build
 ```
