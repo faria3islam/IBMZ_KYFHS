@@ -1,0 +1,184 @@
+# AquaGuard
+
+AquaGuard is an AI-powered Water Health Intelligence platform that helps communities detect possible water safety risks before they become public health crises.
+
+Today, water alerts, flood warnings, contamination risks, infrastructure issues, and community concerns are often scattered across multiple sources and difficult to understand quickly. AquaGuard AI combines all of that into one intelligent dashboard.
+
+The user enters a location, and the system provides:
+
+- Risk level (Safe / Caution / Unsafe)
+- Confidence score
+- AI-generated explanation
+- Contributing risk factors
+- Community reports
+- Sustainability insights
+
+---
+
+## Main Concept
+
+The key principle is:
+
+The AI does not randomly decide risk levels.
+
+Instead:
+
+1. We collect evidence.
+2. We calculate a confidence/risk score.
+3. Then IBM AI explains the result in plain English.
+
+This makes the system:
+
+- Explainable
+- Transparent
+- Technically stronger
+
+---
+
+## Example Scenario
+
+Suppose:
+
+- Heavy rainfall occurs near Windsor.
+- A nearby municipality issues a boil-water advisory.
+- The sewage system is shared.
+- Multiple users report brown/cloudy water.
+
+The platform combines this evidence and outputs:
+
+Risk Level: CAUTION  
+Confidence: 78%
+
+Then the AI explains why.
+
+Example:
+"Recent environmental indicators suggest moderate contamination risk due to nearby flooding, shared sewage infrastructure, and multiple community reports."
+
+---
+
+## AI / RAG Architecture
+
+We use a RAG-style workflow (Retrieval-Augmented Generation).
+
+Meaning:
+The AI retrieves real evidence first, then generates grounded explanations.
+
+The AI does not invent information from nowhere.
+
+Pipeline:
+
+1. User enters location.
+2. Backend collects:
+	- Water advisories
+	- Weather/flood alerts
+	- News articles
+	- Community reports
+	- Municipality infrastructure relationships
+3. Risk engine calculates:
+	- Score
+	- Confidence
+	- Risk level
+4. IBM watsonx.ai / Granite generates:
+	- Explanation
+	- Recommendations
+	- Summary
+5. Dashboard displays results.
+
+---
+
+## IBM Technologies
+
+We are integrating:
+
+- IBM watsonx.ai
+- IBM Granite models
+- IBM Cloud
+- Optional watsonx Assistant
+
+IBM AI is mainly used for:
+
+- Summarization
+- Explanation
+- Alert interpretation
+- Recommendation generation
+
+Not for calculating the actual risk score.
+
+---
+
+## Sustainability / SDGs
+
+Main SDG:
+
+- SDG 6 — Clean Water and Sanitation
+
+Secondary:
+
+- SDG 3 — Good Health and Well-Being
+- SDG 9 — Industry, Innovation and Infrastructure
+- SDG 11 — Sustainable Cities and Communities
+- SDG 13 — Climate Action
+
+This makes the project:
+
+- Sustainability-focused
+- Humanitarian
+- Climate-related
+- Healthcare-related
+
+---
+
+## Risk Scoring Logic
+
+Example weights:
+
+- Boil-water advisory = +50
+- Flood warning = +20
+- Sewage overflow risk = +15
+- Multiple community reports = +10
+
+Risk levels:
+
+- 0-30 = Safe
+- 31-65 = Caution
+- 66+ = Unsafe
+
+This logic lives inside the risk engine.
+
+---
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 18+
+- API key for AI provider used in current implementation
+
+### Installation
+
+```bash
+git clone <repo-url>
+cd IBMZ_KYFHS
+npm install
+```
+
+### Configuration
+
+```bash
+cp .env.example .env
+# Add VITE_GEMINI_API_KEY and API endpoint settings as needed
+```
+
+### Run
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173
+
+### Build
+
+```bash
+npm run build
+```
