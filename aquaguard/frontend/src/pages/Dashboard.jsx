@@ -102,6 +102,7 @@ export default function Dashboard() {
         const [cityRisk, setCityRisk] = useState(null);
         const [cityLoading, setCityLoading] = useState(false);
         const [cityError, setCityError] = useState('');
+        const [usingFallback, setUsingFallback] = useState(false);
 
         function handleSearch(e) {
                 e.preventDefault();
@@ -119,6 +120,7 @@ export default function Dashboard() {
                 if (!hasSearch || isCountry) {
                         setCityRisk(null);
                         setCityError('');
+                        setUsingFallback(false);
                         setCityLoading(false);
                         return;
                 }
@@ -143,6 +145,9 @@ export default function Dashboard() {
 
                                 const riskPayload = await riskResponse.json();
                                 const summaryPayload = summaryResponse.ok ? await summaryResponse.json() : null;
+                                if (!summaryResponse.ok) {
+                                        setCityError('Live risk loaded, but AI summary service is unavailable. Showing backend risk details.');
+                                }
 
                                 const factors = Array.isArray(riskPayload.factors) ? riskPayload.factors : [];
 
@@ -162,6 +167,7 @@ export default function Dashboard() {
                                         matchingReports: Array.isArray(riskPayload.reports) ? riskPayload.reports : [],
                                         explanation: summaryPayload?.summary || 'AI summary unavailable. Showing backend risk result.',
                                 });
+                                setUsingFallback(false);
                         } catch (error) {
                                 if (error?.name === 'AbortError') {
                                         return;
@@ -170,6 +176,7 @@ export default function Dashboard() {
                                 // Fallback keeps the demo usable when backend is unavailable.
                                 setCityRisk(calculateWaterRisk(searchedLocation));
                                 setCityError('Live API unavailable. Showing local fallback data.');
+                                setUsingFallback(true);
                         } finally {
                                 setCityLoading(false);
                         }
@@ -230,6 +237,11 @@ export default function Dashboard() {
                                         {cityError ? (
                                                 <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                                                         {cityError}
+                                                </div>
+                                        ) : null}
+                                        {!cityError ? (
+                                                <div className="rounded-2xl border border-emerald-300/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                                                        {usingFallback ? 'Fallback mode active.' : 'Live backend mode active.'}
                                                 </div>
                                         ) : null}
                                         <RiskCard risk={cityRisk} />

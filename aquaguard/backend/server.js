@@ -2,7 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import alertsRouter from "./routes/alerts.js";
-import { assignRequestId, logRequest } from "./lib/http.js";
+import { assignRequestId, createRateLimiter, logRequest } from "./lib/http.js";
 import reportRouter from "./routes/report.js";
 import riskRouter from "./routes/risk.js";
 import summaryRouter from "./routes/summary.js";
@@ -10,6 +10,8 @@ import overviewRouter from "./routes/overview.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 4000);
+const reportRateLimit = createRateLimiter({ windowMs: 60_000, max: 15, keyPrefix: "report" });
+const summaryRateLimit = createRateLimiter({ windowMs: 60_000, max: 25, keyPrefix: "summary" });
 
 function validateWatsonEnv() {
 	const apiKey = process.env.WATSONX_API_KEY;
@@ -55,8 +57,8 @@ app.get("/health", (_req, res) => {
 
 app.use("/risk", riskRouter);
 app.use("/alerts", alertsRouter);
-app.use("/report", reportRouter);
-app.use("/summary", summaryRouter);
+app.use("/report", reportRateLimit, reportRouter);
+app.use("/summary", summaryRateLimit, summaryRouter);
 app.use("/", overviewRouter);
 
 app.use((req, res) => {

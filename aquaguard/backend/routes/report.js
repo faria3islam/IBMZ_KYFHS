@@ -1,8 +1,10 @@
 import express from "express";
-import { validationError } from "../lib/http.js";
+import { requireApiTokenIfConfigured, validationError } from "../lib/http.js";
 import { addReport } from "../data/mockStore.js";
 
 const router = express.Router();
+
+router.use(requireApiTokenIfConfigured);
 
 router.post("/", (req, res) => {
 	const location = String(req.body?.location || "").trim();

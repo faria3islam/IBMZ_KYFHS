@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "smoke": "bash scripts/smoke.sh"
+    "smoke": "bash scripts/smoke.sh",
+    "test:contract": "bash scripts/contract.sh"
   },
   "dependencies": {
     "cors": "^2.8.5",

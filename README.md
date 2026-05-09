@@ -184,6 +184,8 @@ Edit `.env` and set:
 - `WATSONX_PROJECT_ID`
 - `WATSONX_BASE_URL` (for example `https://us-south.ml.cloud.ibm.com`)
 - `WATSONX_MODEL_ID` (optional)
+- `WATSONX_TIMEOUT_MS` (optional, default `10000`)
+- `API_SHARED_TOKEN` (optional; if set, POST `/report` requires header `x-api-token`)
 
 ### Run frontend
 
@@ -209,6 +211,13 @@ npm start
 ```bash
 cd aquaguard/backend
 npm run smoke
+```
+
+### Contract validation test
+
+```bash
+cd aquaguard/backend
+npm run test:contract
 ```
 
 ---
@@ -242,6 +251,14 @@ Validation errors return HTTP 400 with this shape:
 	"timestamp": "ISO-8601"
 }
 ```
+
+### Runtime Protections
+
+- Rate limits:
+	- `/summary`: 25 requests per minute per IP
+	- `/report`: 15 requests per minute per IP
+- Optional auth guard:
+	- If `API_SHARED_TOKEN` is set, `POST /report` requires header `x-api-token`.
 
 ### Example Requests
 

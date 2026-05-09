@@ -1,5 +1,5 @@
 import express from "express";
-import { validationError } from "../lib/http.js";
+import { logApiError, validationError } from "../lib/http.js";
 import { calculateRisk } from "../lib/riskEngine.js";
 import { generateWatsonSummary } from "../lib/watsonx.js";
 
@@ -37,6 +37,7 @@ router.get("/", async (req, res) => {
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
+    logApiError(req, "summary_generation_failed", error);
     const message = String(error?.message || "Unknown error");
     const invalidApiKey = message.includes("BXNIM0415E") || message.includes("Provided API key could not be found");
     const invalidProjectId = message.includes("project_id should be a version 4 uuid");
