@@ -43,8 +43,8 @@ This makes the system **explainable**, **transparent**, and **technically sound*
 ```
 Risk Level: Medium
 Confidence: 78%
-Explanation: "Recent environmental indicators suggest moderate 
-contamination risk due to nearby flooding, shared sewage 
+Explanation: "Recent environmental indicators suggest moderate
+contamination risk due to nearby flooding, shared sewage
 infrastructure, and multiple community reports."
 ```
 
@@ -82,7 +82,7 @@ User Input (Location)
 | **Frontend** | React + Vite |
 | **Backend** | Node.js + Express |
 | **AI** | IBM watsonx.ai (Granite models) |
-| **Styling** | Tailwind CSS |
+| **Styling** | Plain CSS and SCSS |
 | **Cloud** | IBM Cloud |
 
 ---
@@ -140,40 +140,50 @@ cd IBMZ_KYFHS/aquaguard
 cd frontend && npm install
 cd ../backend && npm install
 
-# Configure backend
-cd backend
-cp .env.example .env
-# Edit .env with your IBM watsonx credentials
+# Configure environment files
+# Edit backend/.env with your IBM watsonx credentials
+# Edit frontend/.env with VITE_API_BASE_URL=http://localhost:4000
 ```
 
 ### Run Local Development
 
 **Terminal 1 — Backend:**
 ```bash
-cd aquaguard/backend
+cd IBMZ_KYFHS/aquaguard/backend
 npm start
 # API runs on http://localhost:4000
 ```
 
 **Terminal 2 — Frontend:**
 ```bash
-cd aquaguard/frontend
+cd IBMZ_KYFHS/aquaguard/frontend
 npm run dev
 # Dashboard runs on http://localhost:5173
 ```
 
-### Environment Variables (Backend)
+### Environment Variables
 
+**Backend (`backend/.env`)**
 ```env
 # IBM watsonx.ai
 WATSONX_API_KEY=<your-api-key>
 WATSONX_PROJECT_ID=<your-project-id>
 WATSONX_BASE_URL=https://us-south.ml.cloud.ibm.com
 WATSONX_MODEL_ID=<optional>
+WATSONX_MODEL_CANDIDATES=<optional-comma-separated-list>
 WATSONX_TIMEOUT_MS=10000
 
 # Optional security
 API_SHARED_TOKEN=<optional-token-for-post-requests>
+
+# Optional service overrides
+NEWSAPI_KEY=<optional-newsapi-key>
+PORT=4000
+```
+
+**Frontend (`frontend/.env`)**
+```env
+VITE_API_BASE_URL=http://localhost:4000
 ```
 
 ### Useful Commands
@@ -210,13 +220,19 @@ npm run preview    # Preview production build
 | Endpoint | Method | Input | Output |
 |----------|--------|-------|--------|
 | `/health` | GET | — | `status`, `service` |
+| `/api/health` | GET | — | `status`, `service` |
 | `/risk` | GET | `location` | `risk`, `confidence`, `riskScore`, `factors` |
 | `/alerts` | GET | `location` (optional) | `alerts[]` |
-| `/summary` | GET | `location` | `risk`, `summary`, `factors` |
 | `/report` | POST | `location`, `issueType`, `description` | `message`, `report` |
-| `/statistics/overview` | GET | — | `totalCompanies`, `uniqueCountries` |
-| `/user/companies` | GET | `limit` (optional) | `Company[]` |
-| `/countries` | GET | — | `Country[]` |
+| `/summary` | GET | `location` | `risk`, `summary`, `factors` |
+| `/api/weather/signal` | GET | `location` | Weather signal |
+| `/api/alerts/signal` | GET | `location` | Alert signal |
+| `/api/advisories/signal` | GET | `location` | Local advisory signal |
+| `/api/gov-advisories/signal` | GET | `location` | Government advisory signal |
+| `/api/floods/signal` | GET | `location` | Flood signal |
+| `/api/news/search` | GET | `city`, `province` | News articles |
+| `/api/reports` | GET/POST | `location` or report payload | Community reports |
+| `/api/locations` | GET | — | Supported locations |
 
 ### Example Requests
 
@@ -235,6 +251,9 @@ curl -X POST "http://localhost:4000/report" \
     "issueType": "cloudy water",
     "description": "Water appears cloudy this morning."
   }'
+
+# Get a weather signal directly
+curl -sG "http://localhost:4000/api/weather/signal" --data-urlencode "location=Windsor, ON"
 ```
 
 ### Example Responses
@@ -259,7 +278,7 @@ curl -X POST "http://localhost:4000/report" \
 |--------|-------|
 | `/summary` rate limit | 25 req/min per IP |
 | `/report` rate limit | 15 req/min per IP |
-| Optional auth guard | `API_SHARED_TOKEN` header if configured |
+| Optional auth guard | `x-api-token` header if `API_SHARED_TOKEN` is configured |
 
 ---
 
@@ -267,22 +286,21 @@ curl -X POST "http://localhost:4000/report" \
 
 ```
 ibmz_kyfhs/
+├── README.md
 ├── aquaguard/
 │   ├── backend/           # Node.js + Express API
 │   │   ├── routes/        # API endpoints
 │   │   ├── services/      # Business logic
-│   │   ├── lib/           # Utilities (risk engine, etc.)
-│   │   └── data/          # Mock & config data
-│   │
-│   └── frontend/          # React + Vite
-│       ├── src/
-│       │   ├── components/  # Reusable components
-│       │   ├── pages/       # Page components
-│       │   ├── api/         # API client
-│       │   └── services/    # Frontend utilities
-│       │
-│       └── index.html     # Entry point
+│   │   ├── lib/           # Utilities (risk engine, watsonx, http helpers)
+│   │   ├── data/          # Seed and configuration data
+│   │   └── scripts/       # API test helpers (smoke/contract)
+│   ├── frontend/          # React + Vite
+│   │   ├── src/
+│   │   │   ├── components/  # Reusable components
+│   │   │   ├── pages/       # Page components
+│   │   │   ├── api/         # API client wrappers
+│   │   │   └── services/    # Frontend utilities
+│   │   └── index.html     # Entry point
 │
-└── README.md              # This file
 ```
 
