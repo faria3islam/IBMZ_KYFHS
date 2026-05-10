@@ -4,17 +4,32 @@ import MarketingBanner from '../../shared/components/MarketingBanner';
 import { useUserAuth } from '../../context/UserAuthContext';
 import publicService from '../../services/PublicService/public.service';
 import { getApiErrorMessage } from '../../shared/utils/apiError';
-import {
-  getCountryISO,
-  getIsoFromCompanyCountry,
-  iso3ToIso2,
-  numericIsoToAlpha2,
-  toAlpha2,
-} from '../../shared/utils/countryMapping';
+import { getIsoFromCompanyCountry, numericIsoToAlpha2, toAlpha2 } from '../../shared/utils/countryMapping';
 import styles from './OverviewPage.module.scss';
 
 const geoUrl = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const OVERVIEW_BACKEND_DISABLED = false;
+
+function geographyToAlpha2(geo) {
+  if (!geo) {
+    return null;
+  }
+  const key = String(geo.id ?? '').padStart(3, '0');
+  if (numericIsoToAlpha2[key]) {
+    return numericIsoToAlpha2[key];
+  }
+  const p = geo.properties || {};
+  const raw =
+    p.iso_a2 ||
+    p.ISO_A2 ||
+    p.ISO_A2_EH ||
+    (typeof p.iso_a2 === 'string' ? p.iso_a2 : '');
+  const code = String(raw).trim().toUpperCase();
+  if (code.length === 2 && /^[A-Z]{2}$/.test(code)) {
+    return code;
+  }
+  return null;
+}
 
 const statCards = [
   {
@@ -76,7 +91,10 @@ export default function OverviewPage() {
 
         const companies = Array.isArray(companiesPayload)
           ? companiesPayload
-          : companiesPayload?.data ?? companiesPayload?.companies ?? [];
+          : companiesPayload?.data ??
+            companiesPayload?.companies ??
+            companiesPayload?.items ??
+            [];
 
         const countriesList = Array.isArray(countriesListRaw) ? countriesListRaw : [];
         setCountriesFromApi(countriesList);
@@ -120,10 +138,18 @@ export default function OverviewPage() {
   }, []);
 
   const countryDataMap = useMemo(() => new Map(Object.entries(stats?.countries || {})), [stats]);
-  const countryNameByAlpha2 = useMemo(
-    () => new Map(countriesFromApi.map((row) => [row.isoCode.toUpperCase(), row.countryName])),
-    [countriesFromApi]
-  );
+  const countryNameByAlpha2 = useMemo(function () {
+    const entries = [];
+    for (const row of countriesFromApi) {
+      if (!row || row.isoCode == null || row.isoCode === '') {
+        continue;
+      }
+      const code = String(row.isoCode).trim().toUpperCase();
+      const name = row.countryName != null && row.countryName !== '' ? String(row.countryName) : code;
+      entries.push([code, name]);
+    }
+    return new Map(entries);
+  }, [countriesFromApi]);
 
   function getFillColor(count) {
     return count > 0 ? 'rgba(20, 184, 166, 0.45)' : 'rgba(203, 213, 225, 0.32)';
@@ -134,10 +160,10 @@ export default function OverviewPage() {
   }
 
   function handleGeographyEnter(geo) {
-    const geoId = String(geo.id).padStart(3, '0');
-    const alpha2 = numericIsoToAlpha2[geoId];
-    const count = countryDataMap.get(alpha2) ?? 0;
-    const countryName = countryNameByAlpha2.get(alpha2) || geo.properties?.name || 'Unknown country';
+    const alpha2 = geographyToAlpha2(geo);
+    const count = alpha2 ? countryDataMap.get(alpha2) ?? 0 : 0;
+    const countryName =
+      (alpha2 && countryNameByAlpha2.get(alpha2)) || geo.properties?.name || 'Unknown country';
 
     setTooltipContent({ country: countryName, count });
   }
@@ -150,8 +176,8 @@ export default function OverviewPage() {
     <div className={styles.root} onMouseMove={handleMouseMove}>
       <div className={styles.sectionHeader}>
         <div>
-          <h1 className={styles.title}>Index Overview</h1>
-          <p className={styles.subtitle}>A read-mostly dashboard for catalog coverage and geography.</p>
+          <h1 className={styles.title}>Leadership overview</h1>
+          <p className={styles.subtitle}>Catalog coverage and geography for executive visibility (companies by country).</p>
         </div>
         <div className={styles.statusChip}>
           {backendStatus === 'live' ? 'Backend mode / Live' : backendStatus === 'fallback' ? 'Fallback mode / Local cache' : 'Checking backend...'}
@@ -196,14 +222,19 @@ export default function OverviewPage() {
                   No geographic coverage is available yet.
                 </div>
               ) : (
-                <ComposableMap projectionConfig={{ scale: 147, center: [0, 20] }} data-tip="">
+                <ComposableMap
+                  projectionConfig={{ scale: 147, center: [0, 20] }}
+                  width={980}
+                  height={500}
+                  style={{ width: '100%', maxWidth: '100%', height: 'auto' }}
+                  data-tip=""
+                >
                   <ZoomableGroup>
                     <Geographies geography={geoUrl}>
                       {({ geographies }) =>
                         geographies.map((geo) => {
-                          const geoId = String(geo.id).padStart(3, '0');
-                          const alpha2 = numericIsoToAlpha2[geoId];
-                          const count = countryDataMap.get(alpha2) ?? 0;
+                          const alpha2 = geographyToAlpha2(geo);
+                          const count = alpha2 ? countryDataMap.get(alpha2) ?? 0 : 0;
                           const isSelected = count > 0;
                           return (
                             <Geography

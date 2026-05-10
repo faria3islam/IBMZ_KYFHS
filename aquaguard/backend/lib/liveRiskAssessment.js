@@ -11,7 +11,7 @@ function normalizeKey(location) {
 }
 
 async function computeLiveAssessment(location) {
-  const base = calculateRisk(location);
+  const base = await calculateRisk(location);
 
   const [weather, newsArticles] = await Promise.all([
     getWeatherSignal(location),
@@ -19,8 +19,8 @@ async function computeLiveAssessment(location) {
   ]);
 
   let riskScore = base.riskScore;
-  const factors = [...base.factors];
-  const alerts = [...base.alerts];
+  const factors = Array.isArray(base.factors) ? [...base.factors] : [];
+  const alerts = Array.isArray(base.alerts) ? [...base.alerts] : [];
 
   if (weather?.available && weather.points > 0) {
     riskScore += weather.points;

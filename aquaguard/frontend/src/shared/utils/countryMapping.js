@@ -116,7 +116,15 @@ export function getCountryISO(country) {
   }
 
   const normalized = country.trim();
-  return countryNameToIso3[normalized] || null;
+  const direct = countryNameToIso3[normalized];
+  if (direct) {
+    return direct;
+  }
+  const lower = normalized.toLowerCase();
+  const byLower = Object.entries(countryNameToIso3).find(function ([name]) {
+    return name.toLowerCase() === lower;
+  });
+  return byLower ? byLower[1] : null;
 }
 
 export function iso3ToIso2Mapper(alpha3) {

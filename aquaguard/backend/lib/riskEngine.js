@@ -1,7 +1,6 @@
 import { ALERT_WEIGHTS, alerts, reports } from "../data/mockStore.js";
 import { getFloodSignal } from "../services/floodService.js";
 import { getGovernmentAdvisorySignal } from "../services/govAdvisoriesService.js";
-import { getWeatherSignal } from "../services/weatherService.js";
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
@@ -100,8 +99,8 @@ function getExternalEndpointSignal(location, envKey) {
 }
 
 async function getExternalSignals(location) {
-  const [weather, govAdvisory, flood, imdSignal, municipalSignal, floodGisSignal] = await Promise.all([
-    getWeatherSignal(location).catch(() => null),
+  // Weather is fetched and scored in liveRiskAssessment.js (Open-Meteo + UI payload), not here, to avoid double counting.
+  const [govAdvisory, flood, imdSignal, municipalSignal, floodGisSignal] = await Promise.all([
     getGovernmentAdvisorySignal(location).catch(() => null),
     getFloodSignal(location).catch(() => null),
     getExternalEndpointSignal(location, "IMD_RAINFALL_API_URL"),
@@ -109,7 +108,7 @@ async function getExternalSignals(location) {
     getExternalEndpointSignal(location, "FLOOD_GIS_API_URL"),
   ]);
 
-  return [weather, govAdvisory, flood, imdSignal, municipalSignal, floodGisSignal].filter(Boolean);
+  return [govAdvisory, flood, imdSignal, municipalSignal, floodGisSignal].filter(Boolean);
 }
 
 export async function calculateRisk(location) {
