@@ -7,6 +7,8 @@
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY || "5683e6bbe764465ca020de603c9220c5";
 const NEWSAPI_ENDPOINT = "https://newsapi.org/v2/everything";
 
+let newsApi429Logged = false;
+
 /** Terms used inside NewsAPI `q` (broad OR group) — must relate to water / environment / health risk */
 const API_TOPIC_GROUP =
   "(" +
@@ -234,7 +236,17 @@ async function fetchNewsArticles(query) {
     const response = await fetch(url.toString());
 
     if (!response.ok) {
-      throw new Error("NewsAPI HTTP " + response.status);
+      if (response.status === 429) {
+        if (!newsApi429Logged) {
+          newsApi429Logged = true;
+          console.warn(
+            "[newsapi] HTTP 429 (rate limit). Set NEWSAPI_KEY in backend .env or wait; news section may be empty."
+          );
+        }
+        return [];
+      }
+      console.warn("[newsapi] HTTP " + response.status + " for news query");
+      return [];
     }
 
     const data = await response.json();
@@ -255,7 +267,7 @@ async function fetchNewsArticles(query) {
       };
     });
   } catch (error) {
-    console.error('Error fetching news for query "' + query.slice(0, 80) + '...":', error.message);
+    console.warn("[newsapi] fetch error:", error?.message || error);
     return [];
   }
 }

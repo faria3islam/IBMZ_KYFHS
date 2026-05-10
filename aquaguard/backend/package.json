@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "node -e \"console.log('aquaguard-ai-backend: no compile step (plain Node ESM). Use npm start.')\"",
     "start": "node server.js",
@@ -10,8 +13,8 @@
     "test:contract": "bash scripts/contract.sh"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2"
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1"
   }
 }
