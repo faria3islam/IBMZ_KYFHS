@@ -1,319 +1,314 @@
-# AquaGuard
+# 💧 AquaGuard
 
-See developer setup and runbook: [aquaguard/README.md](aquaguard/README.md)
-
-AquaGuard is an AI-powered Water Health Intelligence platform that helps communities detect possible water safety risks before they become public health crises.
-
-Today, water alerts, flood warnings, contamination risks, infrastructure issues, and community concerns are often scattered across multiple sources and difficult to understand quickly. AquaGuard combines all of that into one intelligent dashboard.
-
-The user enters a location, and the system provides:
-
-- Risk level (Low / Medium-Low / Medium / Medium-High / High)
-- Confidence score
-- AI-generated explanation
-- Contributing risk factors
-- Community reports
-- Sustainability insights
+**AI-powered Water Health Intelligence Platform** | Detect water safety risks before they become public health crises.
 
 ---
 
-## Main Concept
+## 🎯 Overview
 
-The key principle is:
+AquaGuard combines scattered water data from multiple sources—advisories, flood warnings, contamination risks, infrastructure issues, and community reports—into one intelligent dashboard that helps communities make informed decisions about water safety.
 
-The AI does not randomly decide risk levels.
+### Key Features
 
-Instead:
+When a user enters a location, they receive:
 
-1. We collect evidence.
-2. We calculate a confidence/risk score.
-3. Then IBM AI explains the result in plain English.
-
-This makes the system:
-
-- Explainable
-- Transparent
-- Technically stronger
+- **Risk Level** — Low / Medium-Low / Medium / Medium-High / High
+- **Confidence Score** — How certain the system is (0-100%)
+- **AI-Generated Explanation** — Plain English summary of findings
+- **Contributing Factors** — What triggered the assessment
+- **Community Reports** — Real-time alerts from residents
+- **Sustainability Insights** — Aligned with global water safety goals
 
 ---
 
-## Example Scenario
+## 🧠 How It Works
 
-Suppose:
+### Core Philosophy
 
-- Heavy rainfall occurs near Windsor.
-- A nearby municipality issues a boil-water advisory.
-- The sewage system is shared.
-- Multiple users report brown/cloudy water.
+**The AI does not randomly decide risk levels.**
 
-The platform combines this evidence and outputs:
+Instead, AquaGuard follows a transparent, evidence-based approach:
 
-Risk Level: Medium  
+1. **Collect Evidence** — Aggregate water advisories, weather alerts, news, reports, infrastructure data
+2. **Calculate Risk** — Score and confidence metrics based on real data
+3. **Explain Results** — IBM AI generates human-readable explanations backed by evidence
+
+This makes the system **explainable**, **transparent**, and **technically sound**.
+
+### Real-World Example
+
+**Scenario:** Heavy rainfall near Windsor + boil-water advisory issued + shared sewage system + multiple brown water reports
+
+**Result:**
+```
+Risk Level: Medium
 Confidence: 78%
+Explanation: "Recent environmental indicators suggest moderate 
+contamination risk due to nearby flooding, shared sewage 
+infrastructure, and multiple community reports."
+```
 
-Then the AI explains why.
+### Architecture (RAG Pipeline)
 
-Example:
-"Recent environmental indicators suggest moderate contamination risk due to nearby flooding, shared sewage infrastructure, and multiple community reports."
-
----
-
-## AI / RAG Architecture
-
-We use a RAG-style workflow (Retrieval-Augmented Generation).
-
-Meaning:
-The AI retrieves real evidence first, then generates grounded explanations.
-
-The AI does not invent information from nowhere.
-
-Pipeline:
-
-1. User enters location.
-2. Backend collects:
-	- Water advisories
-	- Weather/flood alerts
-	- News articles
-	- Community reports
-	- Municipality infrastructure relationships
-3. Risk engine calculates:
-	- Score
-	- Confidence
-	- Risk level
-4. IBM watsonx.ai / Granite generates:
-	- Explanation
-	- Recommendations
-	- Summary
-5. Dashboard displays results.
+```
+User Input (Location)
+         ↓
+   Backend Aggregates:
+   • Water advisories
+   • Weather/flood alerts
+   • News articles
+   • Community reports
+   • Infrastructure data
+         ↓
+   Risk Engine Calculates:
+   • Score (0-100)
+   • Confidence level
+   • Risk classification
+         ↓
+   IBM watsonx.ai Generates:
+   • Explanation
+   • Recommendations
+   • Summary
+         ↓
+   Dashboard Displays Results
+```
 
 ---
 
-## IBM Technologies
+## 🛠️ Tech Stack
 
-We are integrating:
-
-- IBM watsonx.ai
-- IBM Granite models
-- IBM Cloud
-- Optional watsonx Assistant
-
-IBM AI is mainly used for:
-
-- Summarization
-- Explanation
-- Alert interpretation
-- Recommendation generation
-
-Not for calculating the actual risk score.
+| Component | Technology |
+|-----------|------------|
+| **Frontend** | React + Vite |
+| **Backend** | Node.js + Express |
+| **AI** | IBM watsonx.ai (Granite models) |
+| **Styling** | Tailwind CSS |
+| **Cloud** | IBM Cloud |
 
 ---
 
-## Sustainability / SDGs
+## ⚙️ Risk Scoring Logic
 
-Main SDG:
+### Example Weights
 
-- SDG 6 — Clean Water and Sanitation
+| Factor | Score |
+|--------|-------|
+| Boil-water advisory | +50 |
+| Flood warning | +20 |
+| Sewage overflow risk | +15 |
+| Multiple community reports | +10 |
 
-Secondary:
+### Risk Level Scale
 
-- SDG 3 — Good Health and Well-Being
-- SDG 9 — Industry, Innovation and Infrastructure
-- SDG 11 — Sustainable Cities and Communities
-- SDG 13 — Climate Action
-
-This makes the project:
-
-- Sustainability-focused
-- Humanitarian
-- Climate-related
-- Healthcare-related
-
----
-
-## Risk Scoring Logic
-
-Example weights:
-
-- Boil-water advisory = +50
-- Flood warning = +20
-- Sewage overflow risk = +15
-- Multiple community reports = +10
-
-Risk levels:
-
-- 0-24 = Low
-- 25-39 = Medium-Low
-- 40-59 = Medium
-- 60-79 = Medium-High
-- 80-100 = High
-
-This logic lives inside the risk engine.
+| Score | Classification |
+|-------|-----------------|
+| 0–24 | Low |
+| 25–39 | Medium-Low |
+| 40–59 | Medium |
+| 60–79 | Medium-High |
+| 80–100 | High |
 
 ---
 
-## Local Development
+## 🌍 Sustainability Alignment
+
+**Primary SDG:** SDG 6 — Clean Water and Sanitation
+
+**Supporting SDGs:**
+- 🏥 SDG 3 — Good Health and Well-Being
+- 🏗️ SDG 9 — Industry, Innovation and Infrastructure
+- 🏙️ SDG 11 — Sustainable Cities and Communities
+- 🌡️ SDG 13 — Climate Action
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- IBM watsonx.ai credentials (for live summary generation)
+- **Node.js 18+**
+- **IBM watsonx.ai credentials** (for live AI features)
 
-### Installation
+### Quick Setup
 
 ```bash
+# Clone and navigate
 git clone <repo-url>
-cd IBMZ_KYFHS
-```
+cd IBMZ_KYFHS/aquaguard
 
-### Install dependencies
+# Install dependencies
+cd frontend && npm install
+cd ../backend && npm install
 
-```bash
-cd aquaguard/frontend
-npm install
-
-cd ../backend
-npm install
-```
-
-### Configure backend environment
-
-```bash
-cd aquaguard/backend
+# Configure backend
+cd backend
 cp .env.example .env
+# Edit .env with your IBM watsonx credentials
 ```
 
-Edit `.env` and set:
+### Run Local Development
 
-- `WATSONX_API_KEY`
-- `WATSONX_PROJECT_ID`
-- `WATSONX_BASE_URL` (for example `https://us-south.ml.cloud.ibm.com`)
-- `WATSONX_MODEL_ID` (optional)
-- `WATSONX_TIMEOUT_MS` (optional, default `10000`)
-- `API_SHARED_TOKEN` (optional; if set, POST `/report` requires header `x-api-token`)
-
-### Run frontend
-
-```bash
-cd aquaguard/frontend
-cp .env.example .env
-npm run dev
-```
-
-Open http://localhost:5173
-
-`VITE_API_BASE_URL` defaults to `http://localhost:4000`.
-
-### Run backend (when available)
-
+**Terminal 1 — Backend:**
 ```bash
 cd aquaguard/backend
 npm start
+# API runs on http://localhost:4000
 ```
 
-### Smoke test backend
-
+**Terminal 2 — Frontend:**
 ```bash
-cd aquaguard/backend
-npm run smoke
+cd aquaguard/frontend
+npm run dev
+# Dashboard runs on http://localhost:5173
 ```
 
-### Contract validation test
+### Environment Variables (Backend)
 
+```env
+# IBM watsonx.ai
+WATSONX_API_KEY=<your-api-key>
+WATSONX_PROJECT_ID=<your-project-id>
+WATSONX_BASE_URL=https://us-south.ml.cloud.ibm.com
+WATSONX_MODEL_ID=<optional>
+WATSONX_TIMEOUT_MS=10000
+
+# Optional security
+API_SHARED_TOKEN=<optional-token-for-post-requests>
+```
+
+### Useful Commands
+
+**Backend:**
 ```bash
-cd aquaguard/backend
-npm run test:contract
+npm start          # Start API server
+npm run smoke      # Run smoke tests
+npm run test:contract  # Validate API contracts
 ```
+
+**Frontend:**
+```bash
+npm run dev        # Development server
+npm run build      # Production build
+npm run preview    # Preview production build
+```
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| `EADDRINUSE: 4000` | Kill the process on port 4000 and retry |
+| Port 5173 conflict | Stop process on 5173 and retry frontend |
 
 ---
 
-## API Contract (Person 2)
+## 📡 API Reference
 
-Base URL (local): `http://localhost:4000`
+**Base URL:** `http://localhost:4000`
 
-| Endpoint | Method | Required Input | Success Response (core fields) |
-|---|---|---|---|
-| `/health` | GET | None | `status`, `service` |
-| `/risk` | GET | `location` query param | `location`, `risk`, `confidence`, `riskScore`, `factors`, `alerts`, `reports`, `generatedAt` |
-| `/alerts` | GET | Optional `location` query param | `count`, `alerts[]` |
-| `/report` | POST | JSON body: `location`, `issueType`, `description` | `message`, `report` |
-| `/summary` | GET | `location` query param | `location`, `risk`, `confidence`, `summary`, `factors`, `generatedAt` |
-| `/statistics/overview` | GET | None | `totalCompanies`, `uniqueCountries` |
-| `/user/companies` | GET | Optional `limit` query param (`1..10000`) | `Company[]` |
-| `/countries` | GET | None | `Country[]` |
+### Endpoints
 
-### Validation Error Format
-
-Validation errors return HTTP 400 with this shape:
-
-```json
-{
-	"error": "validation message",
-	"details": {
-		"field": "context"
-	},
-	"requestId": "uuid",
-	"timestamp": "ISO-8601"
-}
-```
-
-### Runtime Protections
-
-- Rate limits:
-	- `/summary`: 25 requests per minute per IP
-	- `/report`: 15 requests per minute per IP
-- Optional auth guard:
-	- If `API_SHARED_TOKEN` is set, `POST /report` requires header `x-api-token`.
+| Endpoint | Method | Input | Output |
+|----------|--------|-------|--------|
+| `/health` | GET | — | `status`, `service` |
+| `/risk` | GET | `location` | `risk`, `confidence`, `riskScore`, `factors` |
+| `/alerts` | GET | `location` (optional) | `alerts[]` |
+| `/summary` | GET | `location` | `risk`, `summary`, `factors` |
+| `/report` | POST | `location`, `issueType`, `description` | `message`, `report` |
+| `/statistics/overview` | GET | — | `totalCompanies`, `uniqueCountries` |
+| `/user/companies` | GET | `limit` (optional) | `Company[]` |
+| `/countries` | GET | — | `Country[]` |
 
 ### Example Requests
 
 ```bash
+# Get risk for a location
 curl -sG "http://localhost:4000/risk" --data-urlencode "location=Mumbai, MH"
+
+# Get AI summary
 curl -sG "http://localhost:4000/summary" --data-urlencode "location=Mumbai, MH"
-curl -s -X POST "http://localhost:4000/report" -H "Content-Type: application/json" -d '{"location":"Mumbai, MH","issueType":"cloudy water","description":"Water appears cloudy this morning."}'
+
+# Report a water issue
+curl -X POST "http://localhost:4000/report" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": "Mumbai, MH",
+    "issueType": "cloudy water",
+    "description": "Water appears cloudy this morning."
+  }'
 ```
 
-### Example Success Responses
+### Example Responses
 
-`GET /health`
-
+**`GET /risk?location=Mumbai, MH`**
 ```json
 {
-	"status": "ok",
-	"service": "aquaguard-backend"
+  "location": "Mumbai, MH",
+  "risk": "Safe",
+  "confidence": 71,
+  "riskScore": 30,
+  "factors": ["flood warning", "multiple community reports"],
+  "alerts": [],
+  "reports": [],
+  "generatedAt": "2026-05-09T23:40:00.000Z"
 }
 ```
 
-`GET /risk?location=Mumbai,%20MH`
+### Error Format
 
 ```json
 {
-	"location": "Mumbai, MH",
-	"risk": "Safe",
-	"confidence": 71,
-	"riskScore": 30,
-	"factors": ["flood warning", "multiple community reports"],
-	"alerts": [],
-	"reports": [],
-	"generatedAt": "2026-05-09T23:40:00.000Z"
+  "error": "Validation failed",
+  "details": { "field": "context" },
+  "requestId": "uuid",
+  "timestamp": "2026-05-10T10:30:00.000Z"
 }
 ```
 
-`GET /summary?location=Mumbai,%20MH`
+### Rate Limits & Security
 
-```json
-{
-	"location": "Mumbai, MH",
-	"risk": "Safe",
-	"confidence": 71,
-	"summary": "AquaGuard marks Mumbai, MH as Safe...",
-	"factors": ["flood warning", "multiple community reports"],
-	"generatedAt": "2026-05-09T23:40:00.000Z"
-}
+| Policy | Limit |
+|--------|-------|
+| `/summary` rate limit | 25 req/min per IP |
+| `/report` rate limit | 15 req/min per IP |
+| Optional auth guard | `API_SHARED_TOKEN` header if configured |
+
+---
+
+## 📁 Project Structure
+
+```
+IBMZ_KYFHS/
+├── aquaguard/
+│   ├── backend/           # Node.js + Express API
+│   │   ├── routes/        # API endpoints
+│   │   ├── services/      # Business logic
+│   │   ├── lib/           # Utilities (risk engine, etc.)
+│   │   └── data/          # Mock & config data
+│   │
+│   └── frontend/          # React + Vite
+│       ├── src/
+│       │   ├── components/  # Reusable components
+│       │   ├── pages/       # Page components
+│       │   ├── api/         # API client
+│       │   └── services/    # Frontend utilities
+│       │
+│       └── index.html     # Entry point
+│
+└── README.md              # This file
 ```
 
-### Build
+---
 
-```bash
-cd aquaguard/frontend
-npm run build
-```
+## 🤝 Contributing
+
+TODO: Add contribution guidelines.
+
+---
+
+## 📝 License
+
+TODO: Add license information.
+
+---
+
+**Last Updated:** May 10, 2026
