@@ -253,17 +253,6 @@ curl -X POST "http://localhost:4000/report" \
 }
 ```
 
-### Error Format
-
-```json
-{
-  "error": "Validation failed",
-  "details": { "field": "context" },
-  "requestId": "uuid",
-  "timestamp": "2026-05-10T10:30:00.000Z"
-}
-```
-
 ### Rate Limits & Security
 
 | Policy | Limit |
@@ -277,7 +266,7 @@ curl -X POST "http://localhost:4000/report" \
 ## 📁 Project Structure
 
 ```
-IBMZ_KYFHS/
+ibmz_kyfhs/
 ├── aquaguard/
 │   ├── backend/           # Node.js + Express API
 │   │   ├── routes/        # API endpoints
@@ -297,18 +286,3 @@ IBMZ_KYFHS/
 └── README.md              # This file
 ```
 
----
-
-## 🤝 Contributing
-
-TODO: Add contribution guidelines.
-
----
-
-## 📝 License
-
-TODO: Add license information.
-
----
-
-**Last Updated:** May 10, 2026
