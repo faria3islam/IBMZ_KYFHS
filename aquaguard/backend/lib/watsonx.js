@@ -42,10 +42,26 @@ async function getIamToken(apiKey) {
   return payload.access_token;
 }
 
+function normalizeFactors(factors) {
+  if (Array.isArray(factors)) {
+    return factors.map((f) => String(f));
+  }
+  if (factors == null || factors === "") {
+    return [];
+  }
+  return [String(factors)];
+}
+
+function normalizeBreakdown(scoreBreakdown) {
+  return Array.isArray(scoreBreakdown) ? scoreBreakdown : [];
+}
+
 function buildPrompt({ location, risk, confidence, factors, scoreBreakdown = [] }) {
-  const factorText = factors.join(", ") || "no major factors";
-  const breakdownText = scoreBreakdown.length
-    ? scoreBreakdown.map((item) => `${item.label}: +${item.points}`).join(", ")
+  const factorList = normalizeFactors(factors);
+  const breakdownList = normalizeBreakdown(scoreBreakdown);
+  const factorText = factorList.join(", ") || "no major factors";
+  const breakdownText = breakdownList.length
+    ? breakdownList.map((item) => `${item.label}: +${item.points}`).join(", ")
     : "no scored signals";
 
   const riskGuidanceByLevel = {
@@ -71,7 +87,8 @@ function buildPrompt({ location, risk, confidence, factors, scoreBreakdown = [] 
 }
 
 function sanitizeSummary(rawText, { location, risk, confidence, factors }) {
-  const fallback = `AquaGuard marks ${location} as ${risk} (${confidence}% confidence) based on ${factors.join(", ") || "available evidence"}.`;
+  const factorList = normalizeFactors(factors);
+  const fallback = `AquaGuard marks ${location} as ${risk} (${confidence}% confidence) based on ${factorList.join(", ") || "available evidence"}.`;
   if (!rawText) {
     return fallback;
   }
@@ -152,13 +169,22 @@ export async function generateWatsonSummary({ location, risk, confidence, factor
   const projectId = process.env.WATSONX_PROJECT_ID;
   const baseUrl = process.env.WATSONX_BASE_URL;
   const modelId = process.env.WATSONX_MODEL_ID || "ibm/granite-3-8b-instruct";
+  const factorList = normalizeFactors(factors);
+  const breakdownList = normalizeBreakdown(scoreBreakdown);
 
   if (!apiKey || !projectId || !baseUrl) {
-    return `AquaGuard marks ${location} as ${risk} (${confidence}% confidence) based on ${factors.join(", ") || "available evidence"}.`;
+    return `AquaGuard marks ${location} as ${risk} (${confidence}% confidence) based on ${factorList.join(", ") || "available evidence"}.`;
   }
 
-  const token = await getIamToken(apiKey);
-  const prompt = buildPrompt({ location, risk, confidence, factors, scoreBreakdown });
+  let token;
+  try {
+    token = await getIamToken(apiKey);
+  } catch (error) {
+    console.warn("[watsonx] IAM token failed, using text fallback:", String(error?.message || error).slice(0, 200));
+    return sanitizeSummary("", { location, risk, confidence, factors: factorList });
+  }
+
+  const prompt = buildPrompt({ location, risk, confidence, factors: factorList, scoreBreakdown: breakdownList });
 
   const endpoint = `${baseUrl.replace(/\/$/, "")}/ml/v1/text/generation?version=2023-05-29`;
 
@@ -168,21 +194,21 @@ export async function generateWatsonSummary({ location, risk, confidence, factor
     .filter(Boolean);
   const candidateModels = [modelId, ...fallbackModels.filter((value) => value !== modelId)];
 
-  let lastError;
   for (const candidate of candidateModels) {
     try {
       const raw = await generateWithModel({ token, endpoint, projectId, prompt, modelId: candidate });
-      return sanitizeSummary(raw, { location, risk, confidence, factors });
+      return sanitizeSummary(raw, { location, risk, confidence, factors: factorList });
     } catch (error) {
       const message = String(error?.message || "");
       const canTryNext = message.includes("model_not_supported") || message.includes("Model '");
-      if (!canTryNext || candidate === candidateModels[candidateModels.length - 1]) {
-        lastError = error;
-        break;
+      const isLast = candidate === candidateModels[candidateModels.length - 1];
+      if (canTryNext && !isLast) {
+        continue;
       }
-      lastError = error;
+      console.warn("[watsonx] generation failed, using text fallback:", message.slice(0, 200));
+      return sanitizeSummary("", { location, risk, confidence, factors: factorList });
     }
   }
 
-  throw lastError || new Error("Watsonx generation failed");
+  return sanitizeSummary("", { location, risk, confidence, factors: factorList });
 }

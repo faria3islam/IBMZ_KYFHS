@@ -7,6 +7,7 @@ import advisoriesRouter from "./routes/advisories.js";
 import floodsRouter from "./routes/floods.js";
 import govAdvisoriesRouter from "./routes/govAdvisories.js";
 import newsRouter from "./routes/news.js";
+import locationsRouter from "./routes/locations.js";
 import overviewRouter from "./routes/overview.js";
 import reportRouter from "./routes/report.js";
 import reportsRouter from "./routes/reports.js";
@@ -79,6 +80,15 @@ app.use("/api/gov-advisories", govAdvisoriesRouter);
 app.use("/api/floods", floodsRouter);
 app.use("/api/reports", reportsRouter);
 app.use("/api/news", newsRouter);
+app.use("/api/locations", locationsRouter);
+
+process.on("unhandledRejection", function (reason) {
+	console.error("[aquaguard] Unhandled promise rejection:", reason);
+});
+
+process.on("uncaughtException", function (error) {
+	console.error("[aquaguard] Uncaught exception:", error);
+});
 
 app.use((error, req, res, _next) => {
 	console.error(error);

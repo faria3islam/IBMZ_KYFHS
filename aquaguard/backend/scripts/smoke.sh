@@ -7,10 +7,10 @@ echo "[smoke] Health"
 curl -fsS "${BASE_URL}/health" | cat
 
 echo "\n[smoke] Risk"
-curl -fsSG "${BASE_URL}/risk" --data-urlencode "location=Mumbai, MH" | cat
+curl -fsSG "${BASE_URL}/risk" --data-urlencode "location=Mumbai, IN" | cat
 
 echo "\n[smoke] Summary"
-summary_response="$(curl -sSG "${BASE_URL}/summary" --data-urlencode "location=Mumbai, MH")"
+summary_response="$(curl -sSG "${BASE_URL}/summary" --data-urlencode "location=Mumbai, IN")"
 echo "${summary_response}" | cat
 
 if echo "${summary_response}" | grep -q '"error"'; then
@@ -22,5 +22,8 @@ curl -fsS "${BASE_URL}/statistics/overview" | cat
 
 echo "\n[smoke] Countries"
 curl -fsS "${BASE_URL}/countries" | cat
+
+echo "\n[smoke] Location catalog"
+curl -fsS "${BASE_URL}/api/locations/cities" | cat
 
 echo "\n[smoke] Passed"
